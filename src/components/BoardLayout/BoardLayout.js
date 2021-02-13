@@ -2,8 +2,7 @@ import * as React from "react";
 import {Route, Switch} from "react-router-dom";
 import Header from "./Header/Header";
 import Boards from "./Boards/Boards";
-import Login from "../Login/Login";
-import Register from "../Register/Register";
+import Board from "./Board/Board";
 
 const BoardLayout = () => {
 
@@ -12,12 +11,15 @@ const BoardLayout = () => {
 
             <Header/>
             <Switch>
-                <Route path="/">
+                <Route path="/board/:id">
+                    <Board/>
+                </Route>
+                <Route path="">
                     <Boards/>
                 </Route>
-                <Route path="/board/:id">
-                    {/*<SingleBoard/>*/}
-                </Route>
+
+
+
             </Switch>
 
         </>
