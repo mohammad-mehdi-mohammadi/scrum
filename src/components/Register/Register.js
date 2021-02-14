@@ -1,12 +1,51 @@
 import * as React from "react";
 import styles from './Register.module.sass'
-import {Button, Col, Form, Input, Row} from "antd";
+import {Button, Col, Form, Input, message, Row} from "antd";
 import {Link} from "react-router-dom";
+import {endpoint} from "../setupProxy";
 
 const Register = () => {
-
+    const [form] = Form.useForm();
     const onFinish = (values) => {
-        console.log('Success:', values);
+        const data = {
+            "confirm_password": values.confirm,
+            "email": values.email,
+            "password": values.password,
+            "username": values.username
+        }
+        endpoint.post(`/accounts/register/`, data)
+            .then(function (response) {
+                switch (response.status) {
+
+                    // message actions
+                    case 200:
+                    case 201:
+                        // data.map((item, index) => {
+                        //     item.num = (index + 1).toString()
+                        // });
+                        // this.setState({tableList: data})
+                        form.resetFields();
+                        message.success("User has been created successfully")
+                        break;
+
+                }
+                return response.data;
+            })
+            .catch(function (error) {
+                switch (error.response.status) {
+
+                    case 400:
+                        message.error("Missing data")
+                        break;
+                    case 404:
+                        message.error("User not found")
+                        break;
+                    case 500:
+                        message.error("Server error")
+                        break;
+
+                }
+            });
     };
 
     const onFinishFailed = (errorInfo) => {
@@ -17,6 +56,7 @@ const Register = () => {
         <>
             <div className={styles.register}>
                 <Form
+                    form={form}
                     name="basic"
                     onFinish={onFinish}
                     onFinishFailed={onFinishFailed}
@@ -35,7 +75,7 @@ const Register = () => {
                             },
                         ]}
                     >
-                        <Input />
+                        <Input/>
                     </Form.Item>
                     <label>Username:</label>
                     <Form.Item
@@ -47,7 +87,7 @@ const Register = () => {
                             },
                         ]}
                     >
-                        <Input />
+                        <Input/>
                     </Form.Item>
                     <label>Password:</label>
                     <Form.Item
@@ -59,7 +99,7 @@ const Register = () => {
                             },
                         ]}
                     >
-                        <Input.Password />
+                        <Input.Password/>
                     </Form.Item>
                     <label>Confirm Password:</label>
                     <Form.Item
@@ -71,7 +111,7 @@ const Register = () => {
                                 required: true,
                                 message: 'Please confirm your password!',
                             },
-                            ({ getFieldValue }) => ({
+                            ({getFieldValue}) => ({
                                 validator(_, value) {
                                     if (!value || getFieldValue('password') === value) {
                                         return Promise.resolve();
@@ -82,11 +122,11 @@ const Register = () => {
                             }),
                         ]}
                     >
-                        <Input.Password />
+                        <Input.Password/>
                     </Form.Item>
 
                     <Form.Item>
-                        <Row align="middle" className = {styles.registerButton}>
+                        <Row align="middle" className={styles.registerButton}>
                             <Col xs={24} sm={24} md={6} lg={6} xl={6}>
                                 <Button type="primary" htmlType="submit" block>
                                     Register

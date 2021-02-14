@@ -3,20 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@2fd/ant-design-icons": "^2.4.0",
     "@ant-design/icons": "^4.5.0",
+    "@atlaskit/css-reset": "^2.0.0",
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.7.0",
     "antd": "^4.12.3",
+    "axios": "^0.21.1",
     "node-sass": "^5.0.0",
     "react": "^17.0.1",
+    "react-beautiful-dnd": "^8.0.5",
     "react-dom": "^17.0.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.2",
-    "web-vitals": "^1.1.0",
-    "@atlaskit/css-reset": "^2.0.0",
-    "react-beautiful-dnd": "^8.0.5",
-    "styled-components": "^3.2.6"
+    "styled-components": "^3.2.6",
+    "web-vitals": "^1.1.0"
   },
   "scripts": {
     "start": "react-scripts start",

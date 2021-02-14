@@ -1,1 +1,9 @@
 @import './assets/css/ant-design/antd.css';
+body {
+    background-color: #f3f5f5 !important;
+}
+
+.anticon-xl {
+    font-size: 120px;
+    color: #4460f0 !important;
+}

@@ -212,6 +212,7 @@ import Column from './column';
 
 const Container = styled.div`
   display: flex;
+
 `;
 
 class Board extends React.Component {
@@ -284,18 +285,24 @@ class Board extends React.Component {
 
     render() {
         return (
-            <DragDropContext onDragEnd={this.onDragEnd}>
-                <Container>
-                    {this.state.columnOrder.map(columnId => {
-                        const column = this.state.columns[columnId];
-                        const tasks = column.taskIds.map(
-                            taskId => this.state.tasks[taskId],
-                        );
+            <div>
+                <div>
+                    My board
+                </div>
+                <DragDropContext onDragEnd={this.onDragEnd}>
+                    <Container>
+                        {this.state.columnOrder.map(columnId => {
+                            const column = this.state.columns[columnId];
+                            const tasks = column.taskIds.map(
+                                taskId => this.state.tasks[taskId],
+                            );
 
-                        return <Column key={column.id} column={column} tasks={tasks} />;
-                    })}
-                </Container>
-            </DragDropContext>
+                            return <Column key={column.id} column={column} tasks={tasks} />;
+                        })}
+                    </Container>
+                </DragDropContext>
+            </div>
+
         );
     }
 }
