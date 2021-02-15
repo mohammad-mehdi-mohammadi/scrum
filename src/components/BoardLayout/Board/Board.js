@@ -28,30 +28,30 @@ class Board extends React.Component {
         isModalVisible: false,
         visible: false,
         tasks: {
-            'task-X': {id: 'task-X', content: 'Take out the garbage'},
-            'task-2': {id: 'task-2', content: 'Watch my favorite show'},
-            'task-3': {id: 'task-3', content: 'Charge my phone'},
-            'task-4': {id: 'task-4', content: 'Cook dinneXXr'},
+            1: {id: 1, content: 'Take out the garbage'},
+            2: {id: 2, content: 'Watch my favorite show'},
+            3: {id: 3, content: 'Charge my phone'},
+            4: {id: 4, content: 'Cook dinneXXr'},
         },
         columns: {
-            'column-1': {
-                id: 'column-1',
+            'todo': {
+                id: 'todo',
                 title: 'To do',
-                taskIds: ['task-X', 'task-2', 'task-3', 'task-4'],
+                taskIds: [1, 2, 3, 4],
             },
-            'column-2': {
-                id: 'column-2',
+            'inprogress': {
+                id: 'inprogress',
                 title: 'In progress',
                 taskIds: [],
             },
-            'column-3': {
-                id: 'column-3',
+            'done': {
+                id: 'done',
                 title: 'Done',
                 taskIds: [],
             },
         },
         // Facilitate reordering of the columns
-        columnOrder: ['column-1', 'column-2', 'column-3'],
+        columnOrder: ['todo', 'inprogress', 'done'],
     };
 
     formRef = React.createRef();
@@ -104,6 +104,7 @@ class Board extends React.Component {
             });
     };
     onDragEnd = result => {
+        console.log(result)
         const {destination, source, draggableId} = result;
 
         if (!destination) {
@@ -170,47 +171,47 @@ class Board extends React.Component {
 
     componentDidMount() {
         const id = this.props.match.params.id;
-        endpoint.get(`/boards/tasks/${id}`, {
-            headers: headers
-        })
-            .then(function (response) {
-                switch (response.status) {
-
-                    // message actions
-                    case 200:
-                    case 201:
-
-                        // form.resetFields();
-                        // loadData();
-                        break;
-
-                }
-                return response.data;
-            })
-            .catch(function (error) {
-                switch (error.response.status) {
-
-                    case 400:
-
-                        message.error("Bad request")
-                        break;
-                    case 404:
-                        message.error("User not found")
-                        break;
-                    case 500:
-                        message.error("Server error")
-                        break;
-
-                    case 401:
-                        removeToken();
-                        this.props.history.push('/login')
-                        break;
-                    case 403:
-                        this.props.history.push('/')
-                        break;
-
-                }
-            });
+        // endpoint.get(`/boards/${id}`, {
+        //     headers: headers
+        // })
+        //     .then(function (response) {
+        //         switch (response.status) {
+        //
+        //             // message actions
+        //             case 200:
+        //             case 201:
+        //
+        //                 // form.resetFields();
+        //                 // loadData();
+        //                 break;
+        //
+        //         }
+        //         return response.data;
+        //     })
+        //     .catch(function (error) {
+        //         switch (error.response.status) {
+        //
+        //             case 400:
+        //
+        //                 message.error("Bad request")
+        //                 break;
+        //             case 404:
+        //                 message.error("User not found")
+        //                 break;
+        //             case 500:
+        //                 message.error("Server error")
+        //                 break;
+        //
+        //             case 401:
+        //                 removeToken();
+        //                 this.props.history.push('/login')
+        //                 break;
+        //             case 403:
+        //                 this.props.history.push('/')
+        //                 break;
+        //
+        //         }
+        //     });
     }
 
     confirm = () => {

@@ -7,6 +7,7 @@ import {useEffect, useState} from "react";
 import {HistoryOutlined, ProfileOutlined, UserOutlined} from '@ant-design/icons'
 import {getToken, removeToken} from "../../token";
 import {endpoint} from "../../setupProxy";
+
 const Header = () => {
     const headers = {
         'Content-Type': 'application/json',
@@ -27,17 +28,26 @@ const Header = () => {
         setVisibleMenu(true);
     }
     const logout = () => {
+        endpoint.get(`/accounts/logout/`, {
+            headers: headers
+        })
+            .then(function (response) {
+
+            })
+            .catch(function (error) {
+
+            });
         removeToken()
         history.push("/login");
     }
 
     const contentMenu = (
         <div>
-            <a href = "javascript:;" className={css.logout} onClick={logout}>Logout</a>
+            <a href="javascript:;" className={css.logout} onClick={logout}>Logout</a>
         </div>
     )
 
-    function loadData() {
+    const loadData = () => {
 
         endpoint.get(`/boards/board_operations/`, {
             headers: headers
@@ -82,28 +92,30 @@ const Header = () => {
             });
 
     }
+
     useEffect(() => {
         loadData();
     }, []);
     return (
         <>
             <div className={css.header}>
-                <Row align = "middle">
+                <Row align="middle">
                     <Col flex="50px">
 
-                        <Button type="dashed" shape="circle" icon={<ProfileOutlined />}  onClick={showDrawer}></Button>
+                        <Button type="dashed" shape="circle" icon={<ProfileOutlined/>} onClick={showDrawer}></Button>
 
                     </Col>
                     <Col flex="auto">
                         <div className={css.logo}>
-                            <Link to = "/"><img src = {logo}/></Link>
+                            <Link to="/"><img src={logo}/></Link>
                         </div>
                     </Col>
                     <Col flex="50px">
                         <div className={css.avatar}>
                             <Popover placement="bottomRight" title="" content={contentMenu} trigger="click">
-                                <a href = "javascript:;">
-                                    <img src = "https://s.gravatar.com/avatar/9c3a4bf73184f3a5c3f50c393b6d6aa3?size=496&default=retro"/>
+                                <a href="javascript:;">
+                                    <img
+                                        src="https://s.gravatar.com/avatar/9c3a4bf73184f3a5c3f50c393b6d6aa3?size=496&default=retro"/>
                                 </a>
                             </Popover>
 
