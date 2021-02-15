@@ -8,22 +8,17 @@ import {
 import Login from "./components/Login/Login";
 import Register from "./components/Register/Register";
 import BoardLayout from "./components/BoardLayout/BoardLayout";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
     return (
         <div className="App">
             <BrowserRouter>
                 <Switch>
+                    <ProtectedRoute exact path='/login' component={Login}/>
+                    <ProtectedRoute exact path='/register' component={Register}/>
+                    <ProtectedRoute path='/board' component={BoardLayout}/>
 
-                    <Route exact path="/login">
-                        <Login/>
-                    </Route>
-                    <Route exact path="/register">
-                        <Register/>
-                    </Route>
-                    <Route path="/board">
-                        <BoardLayout/>
-                    </Route>
 
                 </Switch>
             </BrowserRouter>

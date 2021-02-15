@@ -28,20 +28,22 @@ class Board extends React.Component {
         isModalVisible: false,
         visible: false,
         tasks: {
-            1: {id: 1, content: 'Take out the garbage'},
-            2: {id: 2, content: 'Watch my favorite show'},
-            3: {id: 3, content: 'Charge my phone'},
-            4: {id: 4, content: 'Cook dinneXXr'},
+
         },
         columns: {
             'todo': {
                 id: 'todo',
                 title: 'To do',
-                taskIds: [1, 2, 3, 4],
+                taskIds: [],
             },
             'inprogress': {
                 id: 'inprogress',
                 title: 'In progress',
+                taskIds: [],
+            },
+            'test': {
+                id: 'test',
+                title: 'Test',
                 taskIds: [],
             },
             'done': {
@@ -51,8 +53,9 @@ class Board extends React.Component {
             },
         },
         // Facilitate reordering of the columns
-        columnOrder: ['todo', 'inprogress', 'done'],
+        columnOrder: ['todo', 'inprogress', 'test', 'done'],
     };
+
 
     formRef = React.createRef();
 
@@ -104,7 +107,6 @@ class Board extends React.Component {
             });
     };
     onDragEnd = result => {
-        console.log(result)
         const {destination, source, draggableId} = result;
 
         if (!destination) {
@@ -120,7 +122,6 @@ class Board extends React.Component {
 
         const start = this.state.columns[source.droppableId];
         const finish = this.state.columns[destination.droppableId];
-
         if (start === finish) {
             const newTaskIds = Array.from(start.taskIds);
             newTaskIds.splice(source.index, 1);
@@ -157,7 +158,6 @@ class Board extends React.Component {
             ...finish,
             taskIds: finishTaskIds,
         };
-
         const newState = {
             ...this.state,
             columns: {
@@ -166,59 +166,84 @@ class Board extends React.Component {
                 [newFinish.id]: newFinish,
             },
         };
+
         this.setState(newState);
     };
 
     componentDidMount() {
         const id = this.props.match.params.id;
-        // endpoint.get(`/boards/${id}`, {
-        //     headers: headers
-        // })
-        //     .then(function (response) {
-        //         switch (response.status) {
-        //
-        //             // message actions
-        //             case 200:
-        //             case 201:
-        //
-        //                 // form.resetFields();
-        //                 // loadData();
-        //                 break;
-        //
-        //         }
-        //         return response.data;
-        //     })
-        //     .catch(function (error) {
-        //         switch (error.response.status) {
-        //
-        //             case 400:
-        //
-        //                 message.error("Bad request")
-        //                 break;
-        //             case 404:
-        //                 message.error("User not found")
-        //                 break;
-        //             case 500:
-        //                 message.error("Server error")
-        //                 break;
-        //
-        //             case 401:
-        //                 removeToken();
-        //                 this.props.history.push('/login')
-        //                 break;
-        //             case 403:
-        //                 this.props.history.push('/')
-        //                 break;
-        //
-        //         }
-        //     });
-    }
+        this.init(id);
 
+    }
+    init = async (id) => {
+        const response = await endpoint.get(`/boards/board_operations/${id}/`, {
+            headers: headers
+        })
+            .then(function (response) {
+                switch (response.status) {
+
+                    // message actions
+                    case 200:
+                    case 201:
+                        return response.data;
+
+                }
+
+            })
+            .catch(function (error) {
+                if (error.response) {
+                    switch (error.response.status) {
+
+                        case 400:
+
+                            message.error("Bad request")
+                            break;
+                        case 404:
+                            message.error("User not found")
+                            break;
+                        case 500:
+                            message.error("Server error")
+                            break;
+
+                        case 401:
+                            removeToken();
+                            this.props.history.push('/login')
+                            break;
+                        case 403:
+                            this.props.history.push('/')
+                            break;
+
+                    }
+                }
+            });
+        this.setState({
+            tasks: response.tasks,
+            columns: {
+                ...this.state.columns,
+                todo: {
+                    ...this.state.columns.todo,
+                    taskIds: response.todo
+                },
+                inprogress: {
+                    ...this.state.columns.inprogress,
+                    taskIds: response.inprogress
+                },
+                test: {
+                    ...this.state.columns.test,
+                    taskIds: response.test
+                },
+                done: {
+                    ...this.state.columns.done,
+                    taskIds: response.done
+                }
+            }
+        })
+    }
     confirm = () => {
         Modal.confirm({
             title: 'Confirm',
             icon: <ExclamationCircleOutlined/>,
-            content: 'Bla bla ...',
+            content: 'Are you sure you want to delete it?',
             okText: 'Delete',
             cancelText: 'Cancel',
         });
@@ -261,11 +286,15 @@ class Board extends React.Component {
                 <div className={css.theBoard}>
                     <Row align="middle">
                         <Col flex="auto">
-                            <b>My board <div className={css.boardMenu}>
-                                <Dropdown overlay={menu} trigger={['click']}>
-                                    <a className="ant-dropdown-link" href="#"><MenuDown/></a>
-                                </Dropdown>
-                            </div></b>
+
+                            <Dropdown overlay={menu} trigger={['click']}>
+                                <div className={css.boardName}>
+                                    <a className="ant-dropdown-link" href="#"><b><h3>My board</h3>
+                                        <div className={css.boardMenu}></div>
+                                        <MenuDown/></b></a>
+                                </div>
+                            </Dropdown>
+
                         </Col>
                         <Col flex="116px"><Button type="primary" onClick={showModal}>Add new task</Button></Col>
                     </Row>

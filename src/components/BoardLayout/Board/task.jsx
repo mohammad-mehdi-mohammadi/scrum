@@ -17,7 +17,7 @@ const Container = styled.div`
 
 export default class Task extends React.Component {
 
-    state = {visible: false, editMode: false}
+    state = {visible: false, editMode: false, colorize: '#fff'}
 
     showModal = () => {
         this.setState({
@@ -68,9 +68,14 @@ export default class Task extends React.Component {
         Modal.confirm({
             title: 'Confirm',
             icon: <ExclamationCircleOutlined />,
-            content: 'Bla bla ...',
+            content: 'Are you sure you want to delete it?',
             okText: 'Delete',
             cancelText: 'Cancel',
+        });
+    }
+    setColorize = (color) => {
+        this.setState({
+            colorize: color
         });
     }
     render() {
@@ -78,16 +83,16 @@ export default class Task extends React.Component {
         const Option = Select.Option;
         const popContent = (
             <div className={css.labels}>
-                <a href="javascript:;" className={css.noneLabel}>
+                <a href="javascript:;" className={css.noneLabel} onClick={() => this.setColorize('#fff')}>
                     <div></div>
                 </a>
-                <a href="javascript:;" className={css.greenLabel}>
+                <a href="javascript:;" className={css.greenLabel} onClick={() => this.setColorize('#3bc93b')}>
                     <div></div>
                 </a>
-                <a href="javascript:;" className={css.redLabel}>
+                <a href="javascript:;" className={css.redLabel} onClick={() => this.setColorize('#fa1a1a')}>
                     <div></div>
                 </a>
-                <a href="javascript:;" className={css.yellowLabel}>
+                <a href="javascript:;" className={css.orangeLabel} onClick={() => this.setColorize('#ffc600')}>
                     <div></div>
                 </a>
 
@@ -110,12 +115,27 @@ export default class Task extends React.Component {
                 >
                     {(provided, snapshot) => (
                         <div>
+
+
                             <Container
                                        {...provided.draggableProps}
                                        {...provided.dragHandleProps}
                                        innerRef={provided.innerRef}
                                        isDragging={snapshot.isDragging}
                             >
+                                {
+                                    this.props.task.priority === 'high' &&
+                                    <div className={css.highPriority}></div>
+                                }
+                                {
+                                    this.props.task.priority === 'low' &&
+                                    <div className={css.lowPriority}></div>
+                                }
+                                {
+                                    this.props.task.priority === 'medium' &&
+                                    <div className={css.mediumPriority}></div>
+                                }
+
                                 <div onClick={this.showModal}>
                                     {this.props.task.content}
                                 </div>
@@ -185,7 +205,7 @@ export default class Task extends React.Component {
                                     <label>label:</label>
                                     <Popover placement="bottom" title="" content={popContent} trigger="click">
                                         <a href="javascript:;" className={css.label}>
-                                            <div></div>
+                                            <div style = {{backgroundColor: this.state.colorize}}></div>
                                         </a>
                                     </Popover>
 

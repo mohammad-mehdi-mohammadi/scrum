@@ -2,7 +2,7 @@ import * as React from "react";
 import css from './Header.module.sass'
 import {Drawer, Button, Col, Row, Popover, message} from "antd";
 import {Link, useHistory} from "react-router-dom";
-import logo from './../../../assets/media/img/Agile-Scrum-logo.png'
+import logo from './../../../assets/media/img/task-management.png'
 import {useEffect, useState} from "react";
 import {HistoryOutlined, ProfileOutlined, UserOutlined} from '@ant-design/icons'
 import {getToken, removeToken} from "../../token";
@@ -107,7 +107,7 @@ const Header = () => {
                     </Col>
                     <Col flex="auto">
                         <div className={css.logo}>
-                            <Link to="/"><img src={logo}/></Link>
+                            <Link to="/board"><img src={logo}/></Link>
                         </div>
                     </Col>
                     <Col flex="50px">
