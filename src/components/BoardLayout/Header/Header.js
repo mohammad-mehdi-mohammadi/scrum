@@ -1,11 +1,19 @@
 import * as React from "react";
 import css from './Header.module.sass'
-import {Drawer, Button, Col, Row, Popover} from "antd";
-import {Link} from "react-router-dom";
+import {Drawer, Button, Col, Row, Popover, message} from "antd";
+import {Link, useHistory} from "react-router-dom";
 import logo from './../../../assets/media/img/Agile-Scrum-logo.png'
-import {useState} from "react";
-import {ProfileOutlined} from '@ant-design/icons'
+import {useEffect, useState} from "react";
+import {HistoryOutlined, ProfileOutlined, UserOutlined} from '@ant-design/icons'
+import {getToken, removeToken} from "../../token";
+import {endpoint} from "../../setupProxy";
 const Header = () => {
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': getToken()
+    }
+    const [boards, setBoards] = useState([])
+    const history = useHistory();
     const [visible, setVisible] = useState(false);
     const [visibleMenu, setVisibleMenu] = useState(false);
 
@@ -18,11 +26,65 @@ const Header = () => {
     const handleVisibleMenu = () => {
         setVisibleMenu(true);
     }
+    const logout = () => {
+        removeToken()
+        history.push("/login");
+    }
+
     const contentMenu = (
         <div>
-            asdad
+            <a href = "javascript:;" className={css.logout} onClick={logout}>Logout</a>
         </div>
     )
+
+    function loadData() {
+
+        endpoint.get(`/boards/board_operations/`, {
+            headers: headers
+        })
+            .then(function (response) {
+                switch (response.status) {
+
+                    // message actions
+                    case 200:
+                    case 201:
+                        if (response.data.length > 0) {
+                            setBoards(response.data)
+                        }
+                        break;
+
+                }
+                return response.data;
+            })
+            .catch(function (error) {
+                switch (error.response.status) {
+
+                    case 400:
+
+                        message.error("Bad request")
+                        break;
+                    case 404:
+                        message.error("User not found")
+                        break;
+                    case 500:
+                        message.error("Server error")
+                        break;
+
+                    case 401:
+                        removeToken();
+                        this.props.history.push('/login')
+                        break;
+                    case 403:
+                        this.props.history.push('/')
+                        break;
+
+                }
+            });
+
+    }
+    useEffect(() => {
+        loadData();
+    }, []);
     return (
         <>
             <div className={css.header}>
@@ -56,9 +118,35 @@ const Header = () => {
                 onClose={onClose}
                 visible={visible}
             >
-                <p>Some contents...</p>
-                <p>Some contents...</p>
-                <p>Some contents...</p>
+                {boards.length > 0 ?
+                    boards.map((item) =>
+                        <Link to={"/board/" + item.id} className={css.boardItem}>
+                            <div>
+                                <h4>
+                                    {item.title}
+                                </h4>
+                                <div>
+                                    <Row>
+                                        <Col xs={24} sm={24} md={24} lg={12} xl={12} alignemnt="left">
+                                            <div className={css.adminUser}>
+                                                <UserOutlined/> {item.admin}
+                                            </div>
+                                        </Col>
+                                        <Col xs={24} sm={24} md={24} lg={12} xl={12}>
+
+                                            <div className={css.deadline}>
+                                                <HistoryOutlined/> {item.due_date}
+                                            </div>
+                                        </Col>
+                                    </Row>
+                                </div>
+
+                            </div>
+                        </Link>
+                    )
+                    :
+                    <div className={css.noBoard}>No board :(</div>
+                }
             </Drawer>
         </>
     );
