@@ -41,7 +41,7 @@ const Boards = () => {
                     // message actions
                     case 200:
                     case 201:
-
+                        message.success("Board has beed created successfully")
                         form.resetFields();
                         loadData();
                         break;

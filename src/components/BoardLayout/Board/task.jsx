@@ -5,6 +5,7 @@ import {Button, Col, DatePicker, Dropdown, Input, Menu, Modal, Popover, Row, Sel
 import css from './Board.module.sass'
 import {DislikeFilled, LikeFilled} from "@ant-design/icons";
 import MenuDown from '@2fd/ant-design-icons/lib/MenuDown'
+import ExclamationCircleOutlined from "@ant-design/icons/lib/icons/ExclamationCircleOutlined";
 const Container = styled.div`
   box-shadow: 0px 1px 2px rgba(0,0,0,0.2);
   border-radius: 6px;
@@ -63,16 +64,21 @@ export default class Task extends React.Component {
     onDateChange(date, dateString) {
         console.log(date, dateString);
     }
-
+    confirm = () => {
+        Modal.confirm({
+            title: 'Confirm',
+            icon: <ExclamationCircleOutlined />,
+            content: 'Bla bla ...',
+            okText: 'Delete',
+            cancelText: 'Cancel',
+        });
+    }
     render() {
         const {TextArea} = Input;
         const Option = Select.Option;
         const popContent = (
             <div className={css.labels}>
                 <a href="javascript:;" className={css.noneLabel}>
-                    <div></div>
-                </a>
-                <a href="javascript:;" className={css.greyLabel}>
                     <div></div>
                 </a>
                 <a href="javascript:;" className={css.greenLabel}>
@@ -84,21 +90,18 @@ export default class Task extends React.Component {
                 <a href="javascript:;" className={css.yellowLabel}>
                     <div></div>
                 </a>
-                <a href="javascript:;" className={css.orangeLabel}>
-                    <div></div>
-                </a>
+
             </div>
         )
         const menu = (
             <Menu>
                 <Menu.Item key="0">
-                    <a href="http://www.alipay.com/">1st menu item</a>
+                    <a href="javascript:;">Edit</a>
                 </Menu.Item>
                 <Menu.Item key="1">
-                    <a href="http://www.taobao.com/">2nd menu item</a>
+                    <a href="javascript:;" onClick={this.confirm}>Delete</a>
                 </Menu.Item>
-                <Menu.Divider />
-                <Menu.Item key="3">3rd menu item</Menu.Item>
+
             </Menu>
         );
         return (
@@ -106,21 +109,29 @@ export default class Task extends React.Component {
                 <Draggable draggableId={this.props.task.id} index={this.props.index}
                 >
                     {(provided, snapshot) => (
-                        <Container onClick={this.showModal}
-                                   {...provided.draggableProps}
-                                   {...provided.dragHandleProps}
-                                   innerRef={provided.innerRef}
-                                   isDragging={snapshot.isDragging}
-                        >
-                            {this.props.task.content}
-                        </Container>
+                        <div>
+                            <Container
+                                       {...provided.draggableProps}
+                                       {...provided.dragHandleProps}
+                                       innerRef={provided.innerRef}
+                                       isDragging={snapshot.isDragging}
+                            >
+                                <div onClick={this.showModal}>
+                                    {this.props.task.content}
+                                </div>
+
+                                <div className={css.menu}>
+                                    <Dropdown overlay={menu} trigger={['click']}>
+                                        <a className={css.taskMenu} href="#"><MenuDown /></a>
+                                    </Dropdown>
+                                </div>
+                            </Container>
+
+                        </div>
                     )}
+
                 </Draggable>
-                <div className={css.menu}>
-                    <Dropdown overlay={menu} trigger={['click']}>
-                        <a className="ant-dropdown-link" href="#"><MenuDown /></a>
-                    </Dropdown>
-                </div>
+
                 <Modal
                     title={this.props.task.content}
                     visible={this.state.visible}

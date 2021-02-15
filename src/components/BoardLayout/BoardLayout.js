@@ -11,13 +11,10 @@ const BoardLayout = () => {
 
             <Header/>
             <Switch>
-                <Route path="/board/:id">
-                    <Board/>
-                </Route>
+                <Route path="/board/:id" component={Board}/>
                 <Route path="">
                     <Boards/>
                 </Route>
-
 
 
             </Switch>
