@@ -1,11 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
 import {Draggable} from 'react-beautiful-dnd';
-import {Button, Col, DatePicker, Dropdown, Input, Menu, Modal, Popover, Row, Select} from "antd";
+import {Button, Col, DatePicker, Dropdown, Input, Menu, message, Modal, Popover, Row, Select} from "antd";
 import css from './Board.module.sass'
 import {DislikeFilled, LikeFilled} from "@ant-design/icons";
 import MenuDown from '@2fd/ant-design-icons/lib/MenuDown'
 import ExclamationCircleOutlined from "@ant-design/icons/lib/icons/ExclamationCircleOutlined";
+import {endpoint} from "../../setupProxy";
+import {getToken, removeToken} from "../../token";
+import CheckSquareOutlined from "@ant-design/icons/lib/icons/CheckSquareOutlined";
+
 const Container = styled.div`
   box-shadow: 0px 1px 2px rgba(0,0,0,0.2);
   border-radius: 6px;
@@ -14,15 +18,68 @@ const Container = styled.div`
   margin-bottom: 8px;
   background-color: ${props => (props.isDragging ? '#d7d7d7' : '#f5f5f5')};
 `;
-
+const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': getToken()
+}
 export default class Task extends React.Component {
 
-    state = {visible: false, editMode: false, colorize: '#fff'}
+    state = {visible: false, editMode: false, colorize: '#fff', content: '', like: false}
 
-    showModal = () => {
+    showModal = (id) => {
         this.setState({
             visible: true,
         });
+
+        this.loadData(id)
+
+    }
+    loadData = async (id) => {
+        const response = await endpoint.get(`/boards/tasks/${id}/`, {
+            headers: headers
+        })
+            .then(function (response) {
+                switch (response.status) {
+
+                    // message actions
+                    case 200:
+                    case 201:
+                        return response.data;
+
+                }
+
+            })
+            .catch(function (error) {
+                if (error.response) {
+                    switch (error.response.status) {
+
+                        case 400:
+
+                            message.error("Bad request")
+                            break;
+                        case 404:
+                            message.error("User not found")
+                            break;
+                        case 500:
+                            message.error("Server error")
+                            break;
+
+                        case 401:
+                            removeToken();
+                            this.props.history.push('/login')
+                            break;
+                        case 403:
+                            this.props.history.push('/')
+                            break;
+
+                    }
+                }
+            });
+        this.setState({
+            content: response.content,
+            like: response.is_confirmed
+        })
+
     }
     handleOk = (e) => {
         console.log(e);
@@ -64,10 +121,11 @@ export default class Task extends React.Component {
     onDateChange(date, dateString) {
         console.log(date, dateString);
     }
+
     confirm = () => {
         Modal.confirm({
             title: 'Confirm',
-            icon: <ExclamationCircleOutlined />,
+            icon: <ExclamationCircleOutlined/>,
             content: 'Are you sure you want to delete it?',
             okText: 'Delete',
             cancelText: 'Cancel',
@@ -77,6 +135,11 @@ export default class Task extends React.Component {
         this.setState({
             colorize: color
         });
+    }
+    likeit = () => {
+        this.setState({
+            like: !this.state.like
+        })
     }
     render() {
         const {TextArea} = Input;
@@ -118,10 +181,10 @@ export default class Task extends React.Component {
 
 
                             <Container
-                                       {...provided.draggableProps}
-                                       {...provided.dragHandleProps}
-                                       innerRef={provided.innerRef}
-                                       isDragging={snapshot.isDragging}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                innerRef={provided.innerRef}
+                                isDragging={snapshot.isDragging}
                             >
                                 {
                                     this.props.task.priority === 'high' &&
@@ -136,13 +199,13 @@ export default class Task extends React.Component {
                                     <div className={css.mediumPriority}></div>
                                 }
 
-                                <div onClick={this.showModal}>
-                                    {this.props.task.content}
+                                <div onClick={() => this.showModal(this.props.task.id)}>
+                                    {this.props.task.title}
                                 </div>
 
                                 <div className={css.menu}>
                                     <Dropdown overlay={menu} trigger={['click']}>
-                                        <a className={css.taskMenu} href="#"><MenuDown /></a>
+                                        <a className={css.taskMenu} href="#"><MenuDown/></a>
                                     </Dropdown>
                                 </div>
                             </Container>
@@ -153,7 +216,7 @@ export default class Task extends React.Component {
                 </Draggable>
 
                 <Modal
-                    title={this.props.task.content}
+                    title={this.props.task.title}
                     visible={this.state.visible}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
@@ -165,9 +228,9 @@ export default class Task extends React.Component {
                             <label>Description:</label>
                             {!this.state.editMode ?
                                 <div onClick={this.enableEditMode} className={css.descriptionEditor}>
-                                    my value
+                                    {this.state.content}
                                 </div> :
-                                <TextArea rows={3} placeholder="Description here..." value="my value"/>
+                                <TextArea rows={3} placeholder="Description here..." value={this.state.content}/>
                             }
 
                             {this.state.editMode &&
@@ -205,7 +268,7 @@ export default class Task extends React.Component {
                                     <label>label:</label>
                                     <Popover placement="bottom" title="" content={popContent} trigger="click">
                                         <a href="javascript:;" className={css.label}>
-                                            <div style = {{backgroundColor: this.state.colorize}}></div>
+                                            <div style={{backgroundColor: this.state.colorize}}></div>
                                         </a>
                                     </Popover>
 
@@ -216,10 +279,9 @@ export default class Task extends React.Component {
 
                                 </Col>
                                 <Col xs={24} sm={24} md={24} lg={10} xl={10}>
-                                    <div className={css.likeDislike}>
+                                    <div className="likeDislike">
 
-                                        <a href="javascript:;" className={css.like}><LikeFilled/></a>
-                                        <a href="javascript:;" className={css.dislike}><DislikeFilled/></a>
+                                        <a href="javascript:;" className={this.state.like && css.active} onClick={this.likeit}><CheckSquareOutlined /></a>
 
                                     </div>
                                 </Col>

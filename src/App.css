@@ -1,4 +1,5 @@
 @import './assets/css/ant-design/antd.css';
+
 body {
     background-color: #f3f5f5 !important;
 }
@@ -7,6 +8,17 @@ body {
     font-size: 120px;
     color: #4460f0 !important;
 }
+
 .ant-dropdown-link:hover {
     text-decoration: none;
+}
+
+.likeDislike {
+    text-align: right
+}
+
+.likeDislike a {
+    font-size: 22px;
+    display: inline-block;
+    color: #cdcdcd;
 }

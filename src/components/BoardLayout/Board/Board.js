@@ -168,6 +168,41 @@ class Board extends React.Component {
         };
 
         this.setState(newState);
+
+
+        endpoint.patch(`/boards/tasks/${result.draggableId}/`, {status: result.destination.droppableId}, {
+            headers: headers
+        })
+            .then(function (response) {
+                return ;
+
+            })
+            .catch(function (error) {
+                if (error.response) {
+                    switch (error.response.status) {
+
+                        case 400:
+
+                            message.error("Bad request")
+                            break;
+                        case 404:
+                            message.error("User not found")
+                            break;
+                        case 500:
+                            message.error("Server error")
+                            break;
+
+                        case 401:
+                            removeToken();
+                            this.props.history.push('/login')
+                            break;
+                        case 403:
+                            this.props.history.push('/')
+                            break;
+
+                    }
+                }
+            });
     };
 
     componentDidMount() {
