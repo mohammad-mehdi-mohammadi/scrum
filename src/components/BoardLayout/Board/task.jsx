@@ -323,13 +323,63 @@ export default class Task extends React.Component {
     }
 
     confirm = () => {
+
         Modal.confirm({
             title: 'Confirm',
             icon: <ExclamationCircleOutlined/>,
             content: 'Are you sure you want to delete it?',
             okText: 'Delete',
             cancelText: 'Cancel',
+            onOk: (this.onTaskDelete)
         });
+    }
+    setTaskId = (id) => {
+        this.setState({
+            taskId: id
+        })
+    }
+    onTaskDelete = async () => {
+        const response = await endpoint.delete(`/boards/tasks/${this.state.taskId}/`, {
+            headers: headers
+        })
+            .then(function (response) {
+                switch (response.status) {
+
+                    // message actions
+                    case 200:
+                    case 201:
+
+                        return;
+
+                }
+            })
+            .catch(function (error) {
+                if (error.response) {
+                    switch (error.response.status) {
+
+                        case 400:
+
+                            message.error("Bad request")
+                            break;
+                        case 404:
+                            message.error("User not found")
+                            break;
+                        case 500:
+                            message.error("Server error")
+                            break;
+
+                        case 401:
+                            removeToken();
+                            this.props.history.push('/login')
+                            break;
+                        case 403:
+                            this.props.history.push('/')
+                            break;
+
+                    }
+                }
+            });
+        message.success("Task has been deleted");
     }
     setColorize = (color, priority) => {
         this.setState({
@@ -556,7 +606,8 @@ export default class Task extends React.Component {
 
                                 <div className={css.menu}>
                                     <Dropdown overlay={menu} trigger={['click']}>
-                                        <a className={css.taskMenu} href="#"><MenuDown/></a>
+                                        <a className={css.taskMenu} onClick={() => this.setTaskId(this.props.task.id)}
+                                           href="#"><MenuDown/></a>
                                     </Dropdown>
                                 </div>
                             </Container>
@@ -587,7 +638,7 @@ export default class Task extends React.Component {
 
                             {this.state.editMode &&
                             <div>
-                                <Button type="primary" onClick = {this.updateDescription}>
+                                <Button type="primary" onClick={this.updateDescription}>
                                     Save
                                 </Button>
                                 <Button type="default" onClick={this.disableEditMode}>

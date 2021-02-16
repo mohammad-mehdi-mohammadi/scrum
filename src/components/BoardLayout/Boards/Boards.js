@@ -166,7 +166,7 @@ const Boards = () => {
                                 </div>
                                 <div className={css.progressHolder}>
                                     <div className={css.progressbar}>
-                                        <div className={css.green} style={{"width": "88%"}}></div>
+                                        <div className={css.green} style={{"width": `${item.progress}%`}}></div>
                                     </div>
                                 </div>
                             </div>

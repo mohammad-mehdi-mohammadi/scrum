@@ -309,9 +309,53 @@ class Board extends React.Component {
             content: 'Are you sure you want to delete it?',
             okText: 'Delete',
             cancelText: 'Cancel',
+            onOk: (this.onBoardDelete)
         });
     }
+    onBoardDelete = async () => {
+        const response = await endpoint.delete(`/boards/board_operations/${parseInt(this.props.match.params.id)}/`, {
+            headers: headers
+        })
+            .then(function (response) {
+                switch (response.status) {
 
+                    // message actions
+                    case 200:
+                    case 201:
+
+                        return;
+
+                }
+            })
+            .catch(function (error) {
+                if (error.response) {
+                    switch (error.response.status) {
+
+                        case 400:
+
+                            message.error("Bad request")
+                            break;
+                        case 404:
+                            message.error("User not found")
+                            break;
+                        case 500:
+                            message.error("Server error")
+                            break;
+
+                        case 401:
+                            removeToken();
+                            this.props.history.push('/login')
+                            break;
+                        case 403:
+                            this.props.history.push('/')
+                            break;
+
+                    }
+                }
+            });
+        message.success("Board has been deleted");
+        this.props.history.push('/board')
+    }
 
     render() {
 
