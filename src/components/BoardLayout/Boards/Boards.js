@@ -12,7 +12,7 @@ const Boards = () => {
     const [form] = Form.useForm();
     const headers = {
         'Content-Type': 'application/json',
-        'Authorization': getToken()
+        'Authorization': "Token " + getToken()
     }
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [boards, setBoards] = useState([])
@@ -41,9 +41,10 @@ const Boards = () => {
                     // message actions
                     case 200:
                     case 201:
-                        message.success("Board has beed created successfully")
+                        message.success("Board has been created successfully")
                         form.resetFields();
                         loadData();
+                        handleCancel();
                         break;
 
                 }

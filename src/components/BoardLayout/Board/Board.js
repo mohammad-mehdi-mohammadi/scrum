@@ -17,7 +17,7 @@ const Container = styled.div`
 `;
 const headers = {
     'Content-Type': 'application/json',
-    'Authorization': getToken()
+    'Authorization': "Token " + getToken()
 }
 
 class Board extends React.Component {
@@ -59,52 +59,30 @@ class Board extends React.Component {
 
     formRef = React.createRef();
 
+    showModal = () => {
+        this.setState({
+            isModalVisible: true
+        });
+    };
+
+    handleOk = () => {
+        this.setState({
+            isModalVisible: false
+        });
+    };
+
+    handleCancel = () => {
+        this.setState({
+            isModalVisible: false
+        });
+    };
+
     onFinish = (values) => {
         const data = {
+            "board": parseInt(this.props.match.params.id),
             "title": values.name
         }
-
-        endpoint.post(`/boards/tasks/`, data, {
-            headers: headers
-        })
-            .then(function (response) {
-                switch (response.status) {
-
-                    // message actions
-                    case 200:
-                    case 201:
-                        message.success("Task has beed created successfully")
-                        // form.resetFields();
-                        // loadData();
-                        break;
-
-                }
-                return response.data;
-            })
-            .catch(function (error) {
-                switch (error.response.status) {
-
-                    case 400:
-
-                        message.error("Bad request")
-                        break;
-                    case 404:
-                        message.error("User not found")
-                        break;
-                    case 500:
-                        message.error("Server error")
-                        break;
-
-                    case 401:
-                        removeToken();
-                        this.props.history.push('/login')
-                        break;
-                    case 403:
-                        this.props.history.push('/')
-                        break;
-
-                }
-            });
+        this.submitForm(data)
     };
     onDragEnd = result => {
         const {destination, source, draggableId} = result;
@@ -274,6 +252,56 @@ class Board extends React.Component {
             }
         })
     }
+    submitForm = async (data) => {
+        const _this = this;
+
+        const response = await endpoint.post(`/boards/tasks/`, data, {
+            headers: headers
+        })
+            .then(function (response) {
+                switch (response.status) {
+
+                    // message actions
+                    case 200:
+                    case 201:
+                        message.success("Task has beed created successfully")
+                        _this.formRef.current.resetFields();
+                        _this.handleCancel()
+
+
+                        return response.data;
+
+                }
+
+            })
+            .catch(function (error) {
+                if (error.response) {
+                    switch (error.response.status) {
+
+                        case 400:
+
+                            message.error("Bad request")
+                            break;
+                        case 404:
+                            message.error("User not found")
+                            break;
+                        case 500:
+                            message.error("Server error")
+                            break;
+
+                        case 401:
+                            removeToken();
+                            this.props.history.push('/login')
+                            break;
+                        case 403:
+                            this.props.history.push('/')
+                            break;
+
+                    }
+                }
+            });
+        this.init(parseInt(this.props.match.params.id));
+    }
     confirm = () => {
         Modal.confirm({
             title: 'Confirm',
@@ -284,25 +312,9 @@ class Board extends React.Component {
         });
     }
 
+
     render() {
 
-        const showModal = () => {
-            this.setState({
-                isModalVisible: true
-            });
-        };
-
-        const handleOk = () => {
-            this.setState({
-                isModalVisible: false
-            });
-        };
-
-        const handleCancel = () => {
-            this.setState({
-                isModalVisible: false
-            });
-        };
         const menu = (
             <Menu>
                 <Menu.Item key="0">
@@ -331,7 +343,7 @@ class Board extends React.Component {
                             </Dropdown>
 
                         </Col>
-                        <Col flex="116px"><Button type="primary" onClick={showModal}>Add new task</Button></Col>
+                        <Col flex="116px"><Button type="primary" onClick={this.showModal}>Add new task</Button></Col>
                     </Row>
 
 
@@ -348,10 +360,10 @@ class Board extends React.Component {
                         })}
                     </Container>
                 </DragDropContext>
-                <Modal title="Create new board" visible={this.state.isModalVisible} onOk={handleOk}
-                       onCancel={handleCancel}
+                <Modal title="Create new board" visible={this.state.isModalVisible} onOk={this.handleOk}
+                       onCancel={this.handleCancel}
                        footer={[
-                           <Button key="back" onClick={handleCancel}>
+                           <Button key="back" onClick={this.handleCancel}>
                                Cancel
                            </Button>,
                            <Button form="newBoard" key="submit" htmlType="submit" type="primary">

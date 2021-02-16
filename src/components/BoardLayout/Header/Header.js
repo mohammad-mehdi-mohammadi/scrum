@@ -11,7 +11,7 @@ import {endpoint} from "../../setupProxy";
 const Header = () => {
     const headers = {
         'Content-Type': 'application/json',
-        'Authorization': getToken()
+        'Authorization': "Token " + getToken()
     }
     const [boards, setBoards] = useState([])
     const history = useHistory();
